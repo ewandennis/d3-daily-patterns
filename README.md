@@ -1,6 +1,6 @@
 # Daily Patterns: A Simple Recurring Event Visualisation
 
-![Daily Patterns Example](sample.png =500x410)
+<img src="sample.png" width="350" alt="Daily Patterns Example">
 
 ## Installation
 
