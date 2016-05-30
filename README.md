@@ -1,8 +1,10 @@
-# Daily Patterns: A Simple Recurring Event Visualisation
+## Daily Patterns: A Simple Recurring Event Visualisation
 
 <img src="sample.png" width="350" alt="Daily Patterns Example">
 
-## Installation
+You can view the content of the repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
+
+### Installation
 
 Prerequisites:
  - Bower
@@ -24,7 +26,7 @@ static -p 8000
 
 [Open http://localhost:8000/ in your browser.](http://localhost:8000/)
 
-## Notes
+### Notes
 
 The detail of each arc can be distracting when loking for broad visual patterns.  Try uncommenting the blur filter in `main.css` to show large scale detail.
 
