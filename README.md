@@ -11,8 +11,8 @@ Prerequisites:
 Clone this repo and install the Bower packages:
 
 ```bash
-git clone ...
-cd ...
+git clone https://github.com/ewandennis/d3-daily-patterns
+cd d3-daily-patterns
 bower install
 ```
 
