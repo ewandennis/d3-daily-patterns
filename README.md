@@ -2,7 +2,7 @@
 
 <img src="sample.png" width="350" alt="Daily Patterns Example">
 
-You can view the content of the repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
+You can view the content of this repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
 
 ### Installation
 
