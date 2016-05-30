@@ -1,0 +1,19 @@
+{
+  "name": "DailyPatterns",
+  "description": "A D3 visualisation of 24-hour recurring events",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.17"
+  }
+}
