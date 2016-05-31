@@ -21,6 +21,7 @@ bower install
 Arrange for an HTTP server to access the visualisation (because CORS):
 
 ```bash
+npm install node-static -g
 static -p 8000
 ```
 
