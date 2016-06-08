@@ -1,40 +1,43 @@
+'use strict';
+
 /*
- * Molly's sleep patterns
+ * Molly's sleep and feeding patterns: 0-6 months
  */
 
-// Parse the incoming date format
-let dateRE = /^\s*(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+)\s*$/
-  , oneDayMS = 1000 * 60 * 60 * 24;
+// Parse the slightly odd incoming date format
+function parseTimestamp(timestr) {
+  let dateRE = /^\s*(\d+)\/(\d+)\/(\d+),\s+(\d+):(\d+)\s*$/
+    , dateParts = dateRE.exec(timestr)
+    , hours = +dateParts[4]
+    , mins = +dateParts[5];
+    return new Date(dateParts[3], dateParts[2], dateParts[1], hours, mins);
+}
 
-// CSV fields: timestamp, duration
-// Dataset fields: start, end, time 
-var model = new CSVModel('Molly_sleep.csv', (rec, idx) => {
-    let dateParts = dateRE.exec(rec.Time)
-      , hours = +dateParts[4]
-      , mins = +dateParts[5]
-      , durationMins = +rec['Duration(minutes)']
-      , start = hours + (mins / 60)
-      , end = start + (durationMins / 60)
-      , time = new Date(dateParts[3], dateParts[2], dateParts[1], hours, mins);
-    return {
-      time: time,
-      start: start,
-      end: end
-    };
-  })
-  , chart = new DailyPatternChart(model);
+let svg = d3.select('#canvas'); 
 
-model.loadP().then(mdl => {
-  let date0 = d3.min(mdl.records.map(d => d.time))
-    , date0Day = Math.floor(date0.getTime() / oneDayMS);
+let chart = new PeriodicPatternChart(svg, { centreWidth: 10 });
 
-  mdl.records = mdl.records.map(d => ({
-    start: d.start,
-    end: d.end,
-    idx: Math.floor(d.time.getTime()/oneDayMS) - date0Day 
-  }));
+let sleepModel = new CSVModel('Molly_sleep.csv', (rec, idx) => ({
+  start: parseTimestamp(rec.Time),
+  duration: +rec['Duration(minutes)'] * 60 * 1000
+}));
 
-  chart.renderTo(document.getElementById('frame'));
+let eatModel = new CSVModel('Molly_nursing.csv', (rec, idx) => { 
+  let duration = (+rec['Left duration'] + +rec['Right duration']) * 60 * 1000;
+  // Short events don't render well on cycles close to the centre
+  if (duration < 10*60*1000) {
+    duration = 10*60*1000;
+  }
+  return {
+    start: parseTimestamp(rec.Time),
+    duration: duration
+  };
+});
+
+Promise.all([sleepModel.loadP(), eatModel.loadP()])
+.then(() => {
+  chart.renderModel(eatModel.records, '#F33');
+  chart.renderModel(sleepModel.records, '#333');
 })
 .catch(err => { throw err; });
 

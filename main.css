@@ -1,11 +1,12 @@
 body {
-  background: #000;
-  color; #ccc;
+  background: #aaa;
 }
 
-#frame {
+#canvas {
+  display: block;
+  margin: auto;
 /*
-  filter: blur(2px);
-  -webkit-filter: blur(2px);
-  */
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+*/
 }
