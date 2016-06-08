@@ -1,63 +1,80 @@
 /*
- * A circular view of a series of events each with a start time and duration.
- * Each event is rendered as an arc on a circle.  The circle radius depicts the 
- * day of the event so later events occur on concentric circles of increasing size.
- * Size of arc denotes duration. Arc angle denotes start time on a 24-hour cycle.
- * 
+ * A circular view of a series of events useful for showing patterns within a given period.
+ *
+ * Each event is rendered as an arc.  The circle radius depicts the cycle the event occurs upon.
+ *
+ * A full revolution represents 1 cycle of a given period (e.g. 24 hours).
+ * Arc length denotes duration and arc angle denotes start and end time .
+ *
+ * Events of differing cycle therefore appear in concentric circles of increasing size.
+ *
  * Expected data structure:
  *  [
  *    {
- *      start: Number,
- *      end: Number,
- *      idx: Number
+ *      start: Date,
+ *      duration: Number // in milliseconds
  *    },
  *    ...
  *  ]
  *
- * start and end are in hours.  e.g. 3.30pm = 15.5.
- * idx is a integer index showing the day of the event.
- *
+ * Options:
+ *   period : cycle length in milliseconds
+ *   centreWidth : width of empty centre in device units
+ *   arcWidth : thickness of arcs in device units
+ *   arcSpacing : spacing between concentric circles in device units
  */
 
-class DailyPatternChart {
-  constructor(model) {
-    this.model = model;
+class PeriodicPatternChart {
+  constructor(svgNode, options) {
+    options = options || {};
+    this.svg = svgNode;
+    this.period = options.period || (24 * 60 * 60 * 1000);
+    this.centreWidth = options.centreWidth || 50;
+    this.arcWidth = options.arcWidth || 1;
+    this.arcSpacing = options.arcSpacing || 2;
   }
 
-  /*
-   * Add an SVG element to the given node and render into it
-   */
-  renderTo(domNode) {
-   let self = this
-      , margin = {top: 10, right: 10, bottom: 10, left: 10}
-      , nodeWidth = parseInt(window.getComputedStyle(domNode).width)
-      , width = nodeWidth - margin.left - margin.right
-      , height = 700 - margin.top - margin.bottom
-      , centreWidth = 50
-      , arcWidth = 1 
-      , spaceWidth = 2 
-      , scale = 0.65 
-      , arc = d3.svg.arc()
-        .startAngle(d => (d.start / 24) * Math.PI * 2)
-        .endAngle(d => (d.end / 24) * Math.PI * 2)
-        .innerRadius(d => Math.floor(centreWidth + (d.idx * (arcWidth+spaceWidth))))
-        .outerRadius(d => Math.floor(centreWidth + ((d.idx+1) * (arcWidth+spaceWidth)) - spaceWidth))
-        .padRadius(0)
-        .padAngle(0)
+  _prepareDataset(records) {
+    let firstDate = Math.floor(d3.min(records.map(d => d.start)).getTime() / this.period);
+    return records.map(d => ({
+      // start: normalised to this.period (0..1)
+      // end:  normalised to this.period (0..1)
+      // idx: 0-N (where N is the number of periods represented by the dataset)
+      start: (d.start.getTime() % this.period) / this.period,
+      end: ((d.start.getTime() + d.duration) % this.period) / this.period,
+      idx: Math.floor(d.start.getTime() / this.period) - firstDate,
+      date: d.start,
+      duration: d.duration
+    })).map(d => ({
+      // If start > end, the event spans 0 in period space.
+      // d3.svg.arc will render 'by going around the long way'.
+      // This produces an almost 360 degree arc so we adjust
+      // start to be -ve to force a minimal arc.
+      start: d.start > d.end ? - (1 - d.start) : d.start,
+      end: d.end,
+      idx: d.idx
+    }));
+  }
 
-    self.svg = d3.select('#frame')
-      .append('svg:svg')
-        .attr('width', width+margin.left+margin.right)
-        .attr('height', height+margin.top+margin.bottom)
+  renderModel(model, color) {
+    let records = this._prepareDataset(model);
+    let arc = d3.svg.arc()
+      .startAngle(d => d.start * Math.PI * 2)
+      .endAngle(d => d.end * Math.PI * 2)
+      .innerRadius(d => Math.floor(this.centreWidth + (d.idx * (this.arcWidth+this.arcSpacing))))
+      .outerRadius(d => Math.floor(this.centreWidth + ((d.idx+1) * (this.arcWidth+this.arcSpacing)) - this.arcSpacing))
+      .padRadius(0)
+      .padAngle(0);
 
-    self.svg.append('g')
-        .attr('transform', 'translate(' + (width+margin.left+margin.right)/2 + ', ' + (height+margin.top+margin.bottom)/2 + ') scale(' + scale + ', ' + scale + ')')
-      .selectAll('path')
-        .data(self.model.records)
-      .enter().append('svg:path')
-        .attr('d', arc)
-        .style('fill', '#FFF')
-        .style('opacity', 1);
+    let svgInsertionPoint = this.svg.append('g')
+      .attr('transform', 'translate(' + (this.svg.attr('width')/2) + ', ' + (this.svg.attr('height')/2) + ')');
+
+    svgInsertionPoint.selectAll('path')
+      .data(records)
+    .enter().append('svg:path')
+      .attr('d', arc)
+      .style('fill', color)
+      .style('opacity', 1);
   }
 }
 
