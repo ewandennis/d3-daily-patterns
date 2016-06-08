@@ -1,8 +1,10 @@
-# Daily Patterns: A Simple Recurring Event Visualisation
+## Daily Patterns: A Simple Recurring Event Visualisation
 
-![Daily Patterns Example](sample.png =500x410)
+<img src="sample.png" width="350" alt="Daily Patterns Example">
 
-## Installation
+You can view the content of this repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
+
+### Installation
 
 Prerequisites:
  - Bower
@@ -11,20 +13,21 @@ Prerequisites:
 Clone this repo and install the Bower packages:
 
 ```bash
-git clone ...
-cd ...
+git clone https://github.com/ewandennis/d3-daily-patterns
+cd d3-daily-patterns
 bower install
 ```
 
 Arrange for an HTTP server to access the visualisation (because CORS):
 
 ```bash
+npm install node-static -g
 static -p 8000
 ```
 
 [Open http://localhost:8000/ in your browser.](http://localhost:8000/)
 
-## Notes
+### Notes
 
 The detail of each arc can be distracting when loking for broad visual patterns.  Try uncommenting the blur filter in `main.css` to show large scale detail.
 
