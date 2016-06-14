@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8"/>
   <script src="vendor/d3/d3.min.js" charset="utf-8"></script>
+  <script src="vendor/quantopy-suncalc/suncalc.js" charset="utf-8"></script>
+  <script src="vendor/he/he.js" charset="utf-8"></script>
   <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-  <svg id="canvas" width="1000" height="1000"></svg>
+  <div class="legend">
+    <ul>
+      <li>Sleeps</li>
+      <li>Eats</li>
+      <li>Sunrise</li>
+      <li>Sunset</li>
+    </ul>
+  </div>
+  <svg id="canvas" width="1050" height="1050"></svg>
   <script src="csvmodel.js"></script>
   <script src="chart.js"></script>
   <script src="main.js"></script>
