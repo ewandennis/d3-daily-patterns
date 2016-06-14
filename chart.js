@@ -24,6 +24,8 @@
  *   arcWidth : thickness of arcs in device units
  *   arcSpacing : spacing between concentric circles in device units
  *   annotationRadius : size of annotation dots
+ *   annotationPadding : padding from edge of outermost cycle to end of annotation line
+ *   annotationLineWidth : annotation line width
  *
  * Note: renderModel() may be called with multiple datasets to overlay onto a single chart.
  * Caveat: set options.startDate if rendering >1 dataset.
@@ -40,6 +42,9 @@ class PeriodicPatternChart {
     this.arcWidth = options.arcWidth || 1;
     this.arcSpacing = options.arcSpacing || 2;
     this.annotationRadius = options.annotationRadius || 20;
+    this.annotationPadding = options.annotationPadding || 15;
+    this.annotationLineWidth = options.annotationLineWidth || 3;
+    this.datasetLength = 0;
   }
 
   // Accepts: timestamp in MS
@@ -100,6 +105,8 @@ class PeriodicPatternChart {
       .padRadius(0)
       .padAngle(0);
 
+    this.datasetLength = d3.max([this.datasetLength, d3.max(records, d=>d.idx)]);
+
     let svgInsertionPoint = this._makeLayer();
 
     svgInsertionPoint.selectAll('path')
@@ -110,20 +117,43 @@ class PeriodicPatternChart {
       .style('opacity', 1);
   }
 
-  annotate(date, color) {
+  annotatePoint(title, date, color) {
     if (!this.annotationLayer) {
       this.annotationLayer = this._makeLayer();
     }
 
+    let maxRadius = this._cycleIndexToRadius(this.datasetLength);
     let radius = this._cycleIndexToRadius(this._dateToCycleIndex(date));
-    let angleDeg = (this._dateToAngle(date) / Math.PI) * 180;
+    let angleRad = this._dateToAngle(date);
+    let angleDeg = (angleRad / Math.PI) * 180;
+    let startPos = this.centreWidth + radius + this.annotationRadius;
+    let endPos = this.centreWidth + maxRadius + this.annotationRadius;
+    let endPtX = endPos * Math.sin(angleRad);
+    let endPtY = endPos * Math.cos(angleRad);
 
     this.annotationLayer.append('circle')
       .attr('cx', 0)
       .attr('cy', 0)
       .attr('r', this.annotationRadius)
-      .attr('transform', 'rotate(' + angleDeg + ') translate(0,' + (-radius) + ')')
-      .style('fill', color)
+      .attr('transform', 'rotate(' + angleDeg + ') translate(0,' + (-(radius+this.centreWidth)) + ')')
+      .style('fill', color);
+
+    let line = this.annotationLayer.append('line')
+      .attr('x1', 0)
+      .attr('y1', -startPos)
+      .attr('x2', 0)
+      .attr('y2', -endPos)
+      .attr('transform', 'rotate(' + angleDeg + ')')
+      .style('stroke', color)
+      .style('stroke-width', this.annotationLineWidth + 'px')
+
+    this.annotationLayer.append('text')
+      .attr('x', endPtX)
+      .attr('y', -endPtY)
+      .attr('font-size', '30px')
+      .attr('stroke', 'none')
+      .attr('fill', color)
+      .text(title);
   }
 }
 

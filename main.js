@@ -54,7 +54,7 @@ Promise.all([sleepModel.loadP(), eatModel.loadP()])
   let chart = new PeriodicPatternChart(svg, {
     centreWidth: 10,
     startDate: d3.min(sleepModel.records[0].start, eatModel.records[0].start),
-    annotationRadius: 3
+    annotationRadius: 10
   });
 
   console.log(`First date ${sleepModel.records[0].start}`);
@@ -64,17 +64,7 @@ Promise.all([sleepModel.loadP(), eatModel.loadP()])
   chart.renderModel(eatModel.records, '#CC0000');
 
   // Timezone: BST -> GMT
-  chart.annotate(new Date(Date.UTC(2015, 9, 25, 1, 0)), 'green');
-
-  let date = sleepModel.records[0].start;
-  let glalat = 55.864237;
-  let glalong = -4.251806;
-  while (date <= sleepModel.records[sleepModel.records.length-1].start) {
-    let sun = SunCalc.getTimes(date, glalat, glalong);
-    chart.annotate(sun.sunrise, 'yellow');
-    chart.annotate(sun.sunset, 'orange');
-    date.setDate(date.getDate() + 1);
-  }
+  chart.annotatePoint('BST → GMT', new Date(Date.UTC(2015, 9, 25, 1, 0)), 'green');
 })
 .catch(err => { throw err; });
 
