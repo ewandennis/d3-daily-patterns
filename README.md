@@ -1,8 +1,14 @@
 ## Daily Patterns: A Simple Recurring Event Visualisation
 
+This is a simple cyclic visualisation for recurring event visualisation.
+
+### Sample Dataset
+
 <img src="sample.png" width="350" alt="Daily Patterns Example">
 
-You can view the content of this repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
+This example shows my daughter's sleeping and feeding patterns over the first 6 months of her life.  Each revolution on the chart is a single 24-hour day, each black arc a sleep period and each red arc a feeding event.
+
+You can view the contents of this repo live [here](http://ewandennis.github.io/d3-daily-patterns/).
 
 ### Installation
 
@@ -29,5 +35,5 @@ static -p 8000
 
 ### Notes
 
-The detail of each arc can be distracting when loking for broad visual patterns.  Try uncommenting the blur filter in `main.css` to show large scale detail.
+The detail of each arc can be distracting when looking for broad visual patterns.  Try uncommenting the blur filter in `main.css` to uncover large scale detail.
 
